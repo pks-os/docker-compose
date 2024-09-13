@@ -7,7 +7,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/buger/goterm v1.0.4
-	github.com/compose-spec/compose-go/v2 v2.1.6
+	github.com/compose-spec/compose-go/v2 v2.2.0
 	github.com/containerd/containerd v1.7.22
 	github.com/containerd/platforms v0.2.1
 	github.com/davecgh/go-spew v1.1.1
@@ -52,7 +52,7 @@ require (
 	go.uber.org/goleak v1.3.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.25.0
 	google.golang.org/grpc v1.62.0
 	gopkg.in/yaml.v3 v3.0.1
