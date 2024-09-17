@@ -128,6 +128,7 @@ func (s *composeService) watch(ctx context.Context, syncChannel chan bool, proje
 		}
 
 		if len(services) == 0 && service.Build == nil {
+			logrus.Debugf("service %q has no build context, skipping watch", service.Name)
 			continue
 		}
 
