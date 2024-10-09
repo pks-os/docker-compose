@@ -13,7 +13,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/reference v0.6.0
 	github.com/docker/buildx v0.17.1
-	github.com/docker/cli v27.3.1+incompatible
+	github.com/docker/cli v27.3.2-0.20241008150905-cb3048fbebb1+incompatible
 	github.com/docker/cli-docs-tool v0.8.0
 	github.com/docker/docker v27.3.1+incompatible
 	github.com/docker/go-connections v0.5.0
@@ -53,10 +53,11 @@ require (
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
 	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.25.0
+	golang.org/x/sys v0.26.0
 	google.golang.org/grpc v1.62.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
+	tags.cncf.io/container-device-interface v0.8.0
 )
 
 require (
@@ -190,5 +191,4 @@ require (
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
-	tags.cncf.io/container-device-interface v0.8.0 // indirect
 )
