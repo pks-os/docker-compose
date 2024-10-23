@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -506,7 +505,10 @@ func (s *composeService) prepareLabels(labels types.Labels, service types.Servic
 	}
 	labels[api.ConfigHashLabel] = hash
 
-	labels[api.ContainerNumberLabel] = strconv.Itoa(number)
+	if number > 0 {
+		// One-off containers are not indexed
+		labels[api.ContainerNumberLabel] = strconv.Itoa(number)
+	}
 
 	var dependencies []string
 	for s, d := range service.DependsOn {
@@ -888,7 +890,6 @@ func buildContainerMountOptions(p types.Project, s types.ServiceConfig, img moby
 			if m.Type == "volume" {
 				src = m.Name
 			}
-			m.Destination = path.Clean(m.Destination)
 
 			if img.Config != nil {
 				if _, ok := img.Config.Volumes[m.Destination]; ok {
@@ -1111,8 +1112,6 @@ func buildMount(project types.Project, volume types.ServiceVolumeConfig) (mount.
 	}
 
 	bind, vol, tmpfs := buildMountOptions(volume)
-
-	volume.Target = path.Clean(volume.Target)
 
 	if bind != nil {
 		volume.Type = types.VolumeTypeBind
