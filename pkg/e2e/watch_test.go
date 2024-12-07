@@ -17,6 +17,7 @@
 package e2e
 
 import (
+	"bytes"
 	"crypto/rand"
 	"fmt"
 	"os"
@@ -288,4 +289,41 @@ func doTest(t *testing.T, svcName string) {
 	poll.WaitOn(t, checkFileContents("/app/config/file.config", "This is an updated config file"))
 
 	testComplete.Store(true)
+}
+
+func TestWatchExec(t *testing.T) {
+	c := NewCLI(t)
+	const projectName = "test_watch_exec"
+
+	defer c.cleanupWithDown(t, projectName)
+
+	tmpdir := t.TempDir()
+	composeFilePath := filepath.Join(tmpdir, "compose.yaml")
+	CopyFile(t, filepath.Join("fixtures", "watch", "exec.yaml"), composeFilePath)
+	cmd := c.NewDockerComposeCmd(t, "-p", projectName, "-f", composeFilePath, "up", "--watch")
+	buffer := bytes.NewBuffer(nil)
+	cmd.Stdout = buffer
+	watch := icmd.StartCmd(cmd)
+
+	poll.WaitOn(t, func(l poll.LogT) poll.Result {
+		out := buffer.String()
+		if strings.Contains(out, "64 bytes from") {
+			return poll.Success()
+		}
+		return poll.Continue("%v", watch.Stdout())
+	})
+
+	t.Logf("Create new file")
+
+	testFile := filepath.Join(tmpdir, "test")
+	require.NoError(t, os.WriteFile(testFile, []byte("test\n"), 0o600))
+
+	poll.WaitOn(t, func(l poll.LogT) poll.Result {
+		out := buffer.String()
+		if strings.Contains(out, "SUCCESS") {
+			return poll.Success()
+		}
+		return poll.Continue("%v", out)
+	})
+	c.RunDockerComposeCmdNoCheck(t, "-p", projectName, "kill", "-s", "9")
 }
