@@ -9,7 +9,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/buger/goterm v1.0.4
-	github.com/compose-spec/compose-go/v2 v2.4.6-0.20241203131247-9a9cc5d9c345
+	github.com/compose-spec/compose-go/v2 v2.4.6
 	github.com/containerd/containerd v1.7.24
 	github.com/containerd/platforms v0.2.1
 	github.com/davecgh/go-spew v1.1.1
@@ -55,8 +55,8 @@ require (
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
 	golang.org/x/sync v0.10.0
-	golang.org/x/sys v0.27.0
-	google.golang.org/grpc v1.68.0
+	golang.org/x/sys v0.28.0
+	google.golang.org/grpc v1.68.1
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
 	tags.cncf.io/container-device-interface v0.8.0
@@ -172,11 +172,11 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.28.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
