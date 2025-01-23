@@ -93,10 +93,7 @@ func TestRebuildOnDotEnvWithExternalNetwork(t *testing.T) {
 	t.Log("wait for watch to start watching")
 	c.WaitForCondition(t, func() (bool, string) {
 		out := r.String()
-		errors := r.String()
-		return strings.Contains(out,
-				"Watch configuration"), fmt.Sprintf("'Watch configuration' not found in : \n%s\nStderr: \n%s\n", out,
-				errors)
+		return strings.Contains(out, "Watch enabled"), "watch not started"
 	}, 30*time.Second, 1*time.Second)
 
 	pn := c.RunDockerCmd(t, "inspect", containerName, "-f", "{{ .HostConfig.NetworkMode }}")
@@ -112,7 +109,7 @@ func TestRebuildOnDotEnvWithExternalNetwork(t *testing.T) {
 	t.Log("check if the container has been rebuild")
 	c.WaitForCondition(t, func() (bool, string) {
 		out := r.String()
-		if strings.Count(out, "batch complete: service["+svcName+"]") != 1 {
+		if strings.Count(out, "batch complete") != 1 {
 			return false, fmt.Sprintf("container %s was not rebuilt", containerName)
 		}
 		return true, fmt.Sprintf("container %s was rebuilt", containerName)
@@ -283,7 +280,7 @@ func doTest(t *testing.T, svcName string) {
 			return poll.Continue("%v", r.Combined())
 		}
 	}
-	poll.WaitOn(t, checkRestart(fmt.Sprintf("service %q restarted", svcName)))
+	poll.WaitOn(t, checkRestart(fmt.Sprintf("service(s) [%q] restarted", svcName)))
 	poll.WaitOn(t, checkFileContents("/app/config/file.config", "This is an updated config file"))
 
 	testComplete.Store(true)
@@ -323,5 +320,51 @@ func TestWatchExec(t *testing.T) {
 		}
 		return poll.Continue("%v", out)
 	})
+	c.RunDockerComposeCmdNoCheck(t, "-p", projectName, "kill", "-s", "9")
+}
+
+func TestWatchMultiServices(t *testing.T) {
+	c := NewCLI(t)
+	const projectName = "test_watch_rebuild"
+
+	defer c.cleanupWithDown(t, projectName)
+
+	tmpdir := t.TempDir()
+	composeFilePath := filepath.Join(tmpdir, "compose.yaml")
+	CopyFile(t, filepath.Join("fixtures", "watch", "rebuild.yaml"), composeFilePath)
+
+	testFile := filepath.Join(tmpdir, "test")
+	require.NoError(t, os.WriteFile(testFile, []byte("test"), 0o600))
+
+	cmd := c.NewDockerComposeCmd(t, "-p", projectName, "-f", composeFilePath, "up", "--watch")
+	buffer := bytes.NewBuffer(nil)
+	cmd.Stdout = buffer
+	watch := icmd.StartCmd(cmd)
+
+	poll.WaitOn(t, func(l poll.LogT) poll.Result {
+		if strings.Contains(watch.Stdout(), "Attaching to ") {
+			return poll.Success()
+		}
+		return poll.Continue("%v", watch.Stdout())
+	})
+
+	waitRebuild := func(service string, expected string) {
+		poll.WaitOn(t, func(l poll.LogT) poll.Result {
+			cat := c.RunDockerComposeCmdNoCheck(t, "-p", projectName, "exec", service, "cat", "/data/"+service)
+			if strings.Contains(cat.Stdout(), expected) {
+				return poll.Success()
+			}
+			return poll.Continue("%v", cat.Combined())
+		})
+	}
+	waitRebuild("a", "test")
+	waitRebuild("b", "test")
+	waitRebuild("c", "test")
+
+	require.NoError(t, os.WriteFile(testFile, []byte("updated"), 0o600))
+	waitRebuild("a", "updated")
+	waitRebuild("b", "updated")
+	waitRebuild("c", "updated")
+
 	c.RunDockerComposeCmdNoCheck(t, "-p", projectName, "kill", "-s", "9")
 }
